@@ -1,130 +1,155 @@
 #include <iostream>
 #include <conio.h>
-#include <string>
-//задание cтека
 
+//задание линейного списка
 using namespace std;
 
+const int DATE = 3;
 
-///////////////////////// - стек
-struct steck
-
+struct File
 {
+	string name;
+	int date[DATE];//день/месяц/год;
+	int counter;
 
-	string word;
-
-	steck* next;
-
+	File* next;
 };
 
-///////////////////////// - прототипы функций
-void push(steck*& next, string word);
-string pop(steck*& next);
-string rev_word(string word);
-void print_menu();
+//прототипы функций
 int input_number();
+int input_day();
+int input_month();
+int input_year();
+string input_name();
+void print_menu();
+void add_file(File** begin);
+void print_catalog(File** begin);
+void delete_files(File** begin);
+void find_file(File** begin);
 
-//////////////////////// - логический блок
-int main()
+//логика программы
+int main() 
 {
 	setlocale(LC_ALL, "Rus");
-	steck* p = 0; // инициализация стека
-	int n;
-	int check = 0;
-	string word;
-
-	while (check != 48)
+	
+	File* begin = NULL;//инициализация списка
+	int key = 0, amount, choice;
+	while (key != 48)
 	{
 		print_menu();
-		check = _getch(); // считывает нажатие клавиши и возращает ее код
-		switch (check)
+		key = _getch();
+		switch(key)
 		{
 
-		case 49:
+		case 49://добавление элементов в каталог
 		{
-			// ввод элементов в стек
-			cout << "Enter count of words for stack -> ";
-			n = input_number();
-			cout << "Enter " << n << " str words:\n";
-			for (int i = 0; i < n; i++)
+			system("cls");
+			cout << "How many files do you want to add?\n->";
+			cin >> amount;
+			for (int i = 0; i < amount; i++)
 			{
-				cout << "Enter " << i + 1 << " word -> ";
-				cin >> word;
-				push(p, word);
+				add_file(&begin);
 			}
-			cout << endl;
-			// вывод элементов из стека
-			for (int i = 0; i < n; i++)
-			{
-				word = rev_word(pop(p));
-				cout << "Word " << i + 1 << " " << word << endl;
-			}
-			cout << endl;
-
 		}break;
 
-		case 48:
+		case 50://вывод всех элементов каталога
+		{
+			system("cls");
+			print_catalog(&begin);
+		}break;
+
+		case 51://удаление элемента из каталога
+		{
+			system("cls");
+			delete_files(&begin);
+		}break;
+
+		case 52://вывод самого популярного файла
+		{
+			system("cls");
+			find_file(&begin);
+		}break;
+
+		case 48://выход из программы
 		{
 			system("cls");
 			cout << "Goodbuy" << endl;
 			cout << endl;
-
 		}break;
 
 		default:
-			{
-
+		{
 			cout << "Wrong input! Press key 0 or 1..." << endl;
-			
-			}
+		}
+
 		}
 	}
-
 	system("Pause");
 	return 0;
 }
 
-////////////////////////// - описание функций
-//функция добавления элемента в стек
-void push(steck*& next, string word)
+//блок функций
+
+//функция проверки дня
+int input_day()
 {
-	steck* Stack = new steck;
-	Stack->word = word;
-	Stack->next = next;//в поле ссылки передаем указатель на предыдущий элемент
-	next = Stack;// головному указателю даем ссылку на Stack
+	int day;
+	while (true)
+	{
+		day = input_number();
+		if (day >= 1 && day <= 31)
+		{
+			break;
+		}
+		else 
+		{
+			cout << "Wrong day!\n";
+			cout << "->";
+		}
+	}
+	return day;
 }
 
-//функция изъятия элемента из стека
-string pop(steck*& next)
+//функции проверки месяца
+int input_month()
 {
-	string temp = next->word;
-	
-	steck* MyStack = next;
-	next = next->next;
-	delete MyStack;
-
-	return temp;
-
+	int month;
+	while (true) 
+	{
+		month = input_number();
+		if (month >= 1 && month <= 12)
+		{
+			break;
+		}
+		else
+		{
+			cout << "Wrong month!\n";
+			cout << "->";
+		}
+	}
+	return month;
 }
 
-//функция вывода меню
-void print_menu() {
-
-	cout << "*****************************************************************\n";
-
-	cout << "\t\t\t     |Steck|\n" << endl;
-
-	cout << "\t\tPress any key to make operation:\n" << endl
-
-		<< "\t\tPress '1' to create new steck\n"
-
-		<< "\t\tPress '0' to exit from program.\n";
-
-	cout << "\n*****************************************************************\n";
-
+//функции проверка года
+int input_year()
+{
+	int year;
+	while (true)
+	{
+		year = input_number();
+		if (year >= 0 && year <= 2019)
+		{
+			break;
+		}
+		else 
+		{
+			cout << "Wrong year!\n";
+			cout << "->";
+		}
+	}
+	return year;
 }
-
-//функция проверки ввода числа
+//Ввод натуральных чисел
 int input_number()
 {
 	int number;
@@ -137,21 +162,230 @@ int input_number()
 		cout << "Enter integer element -> ";
 	}
 
-	cout << "Successfully!\n\n" << endl;
 	return number;
 }
 
-//функция полного отображения строки строки
-// begin - возвращает итератор с первым элементом
-// end - возвращает итератор с последним элементом
-// lenght - возвращает количество символов в строке
-// reverse - меняет порядок элементов контейнера в диапазоне
-// начало - конец на противоположный
-string rev_word(string word)
+//Ввод имени файла
+string input_name()
 {
-	if (word.length()) 
+	string name;
+	cin >> name;
+	return name;
+}
+
+//функция добавления файла в список
+void add_file(File** begin)
+{
+	File* add = new File; //выделение памяти под новый файл
+	cout << "******************************************************************\n";
+
+	cout << "\t\t\t    |Add new file|\n" << endl;
+	cout << "\t\t\tEnter the name of file\n\t\t\t-> ";
+	add->name = input_name();
+
+	cout << "\t\t\tEnter amount of views \n\t\t\t-> ";
+	add->counter = input_number();
+
+	cout << "\t\t\t\Enter the date of the release\n";
+	cout << "\t\t\t    Day | Month | Year" << endl;
+	for (int i = 0; i < DATE; i++)
 	{
-		reverse(word.begin(), word.end());
+		cout << "\t\t\t->";
+		if (i == 0)
+		{
+			add->date[i] = input_day();
+		}
+		else if (i == 1)
+		{
+			add->date[i] = input_month();
+		}
+		else
+		{
+			add->date[i] = input_year();
+		}
 	}
-	return word;
+	add->next = NULL;//указатель на следующий элемент на NULL
+	cout << "\n\t\t\t    |File was added!|\n";
+
+	cout << "******************************************************************\n";
+	if (*begin)//если есть 1ый элемент
+	{
+		File* addd = *begin; // передаем указателю add самый первый элемент
+		while (true)// работает до добавления элемента в список
+		{
+			if (!addd->next)//  если не существует указателя на следующий
+			{
+				addd->next = add;// передаем элементу адрес следующего сегмента
+				break;
+			}
+			addd = addd->next;// если же существует указатель на следующий элемент, то указателю addd передается этот элемент
+		}
+	}
+	else//если нет 1ого элемента
+	{
+		*begin = add;//присваеваем в виде 1ого элемента введеный
+	}
+}
+
+
+//вывод каталога с файлами на экран
+void print_catalog(File **begin)
+{
+	cout << "******************************************************************\n";
+	cout << "\t\t|Information about The Catalog|\n";
+	if (*begin) 
+	{
+		File* print = *begin;
+		while (true) 
+		{
+			cout << "------------------------------------------------------------------\n";
+			cout << "Name: " << print->name << endl;
+			cout << "Amount of views: " << print->counter<< endl;
+			cout << "Date of creation: ";
+			for(int i = 0; i < DATE; i++)
+			{
+				cout << print->date[i] << "/";
+			}
+			cout << endl;
+			cout << "------------------------------------------------------------------\n";
+
+			if (!print->next)
+			{
+				break;
+			}
+
+			print = print->next;
+		}
+	}
+	else
+	{
+		cout << "\t\t     |The Catalog is empty|\n";
+	}
+	cout << "******************************************************************\n";
+}
+
+//функция вывода меню
+void print_menu() {
+
+	cout << "*****************************************************************\n";
+
+	cout << "\t\t\t     |Catalog|\n" << endl;
+
+	cout << "\t\tPress any key to make operation:\n" << endl
+
+		<< "\t\tPress '1' to add new file.\n"
+
+		<< "\t\tPress '2' to print the catalog.\n"
+
+		<< "\t\tPress '3' to delete files, which were\n" 
+		<< "\t\t\t  created after certain date.\n"
+
+		<< "\t\tPress '4' to get the most popular file.\n"
+
+		<< "\t\tPress '0' to exit from program.\n";
+
+	cout << "\n*****************************************************************\n";
+}
+
+//функция удаления элементов с датой меньше заданной
+void delete_files(File** begin)
+{
+	int day_c;
+	int month_c;
+	int year_c;
+	int counter = 0;
+	cout << "*****************************************************************\n";
+
+	cout << "\t\t     |Delete files from Catalog|\n" << endl;
+	cout << "\t\tEnter a verifying day   -> ";
+	day_c = input_day();
+	cout << "\t\tEnter a verifying month -> ";
+	month_c = input_month();
+	cout << "\t\tEnter a verifying year  -> ";
+	year_c = input_year();
+
+	File* prev_p = NULL, * del_p, *p = *begin;
+
+	if (!(*begin))
+	{
+		cout << "\n\t\t\t |Catalog is empty.|" << endl;
+		cout << "*****************************************************************\n";
+		return;
+	}
+	while (true)
+	{
+		counter += 1;
+		if (year_c > p->date[2] || (year_c == p->date[2] && month_c > p->date[1]) || 
+			(year_c == p->date[2] && month_c == p->date[1] && day_c > p->date[0]))//первый элемент
+		{
+			if (counter == 1)//если элемент 1ый или элемент единственный 
+			{
+				if(!p->next)
+				{
+					*begin = NULL;
+					delete p;
+					break;
+				}
+				else
+				{
+					del_p = p;
+					p = p->next;
+					*begin = p; //изменение первого элемента исходного списка
+					delete del_p;
+					counter = 0;
+				}
+			}
+			else if (!p->next)//последний элемент
+			{
+				del_p = p;
+				prev_p->next = NULL;//предыдущий указатель указывает на нулл
+				delete del_p;
+				break;
+			}
+			else//остальные элементы
+			{
+				prev_p->next = p->next;//изменяем указатель предыдущего через объект
+				del_p = p;
+				p = p->next;
+				delete del_p;
+			}
+		}
+		else//если элемент подходит
+		{
+			if (!p->next)
+			{
+				break;
+			}
+			prev_p = p;
+			p = p->next;
+		}
+	}
+	cout << "\t\t\t |Files were deleted|\n" << endl;
+	cout << "*****************************************************************\n";
+}
+//функция вывода файла с наибольшим количеством просмотров
+void find_file(File** begin)
+{
+	File *certain_file = NULL, *p = *begin;
+	int max = 0;
+	while (true)
+	{
+		if(p->counter > max)
+		{
+			certain_file = p;
+			max = certain_file->counter;
+		}
+		if (!p->next)
+		{
+			break;
+		}
+
+		p = p->next;
+	}
+	cout << "*****************************************************************\n";
+	cout << "\n\tThe largest part of views has file with name ' " << certain_file->name << " '.";
+	cout << "\n\t\t  This file has - " << certain_file->counter << " views.";
+	cout << "\n\t\tThe date of creation: " << certain_file->date[0] << "/" << certain_file->date[1] << "/" << certain_file->date[2] << endl;
+	cout << "\n*****************************************************************\n";
+
 }
